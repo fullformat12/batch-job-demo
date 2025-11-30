@@ -1,6 +1,8 @@
 package bimatlaptrinh.com.batch.config;
 
 import bimatlaptrinh.com.batch.model.User;
+import bimatlaptrinh.com.batch.monitor.BatchMetricsListener;
+import bimatlaptrinh.com.batch.monitor.JobMonitoringListener;
 import bimatlaptrinh.com.batch.pocessor.UserProcessor;
 import bimatlaptrinh.com.batch.reader.UserReader;
 import bimatlaptrinh.com.batch.tasklet.ExportExcelTasklet;
@@ -44,9 +46,10 @@ public class BatchConfig {
     }
 
     @Bean
-    public Job userJob(JobRepository jobRepository, PlatformTransactionManager tx) {
+    public Job userJob(JobRepository jobRepository, PlatformTransactionManager tx, BatchMetricsListener jobMonitoringListener) {
         return new JobBuilder("userJob", jobRepository)
                 .start(readDbStep(jobRepository, tx))
+                .listener(jobMonitoringListener)
                 .next(exportExcelStep(jobRepository, tx))
                 .build();
     }
